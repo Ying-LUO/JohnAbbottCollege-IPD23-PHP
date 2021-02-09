@@ -13,29 +13,39 @@
         // include will issue just a warning, require will result a fatal error
         require_once 'db.php';
         // <<<MARKER heredoc
-        function displayForm($name = "", $age = ""){
+        function displayForm($username = "", $email = ""){
             $form = <<< ENDMARKER
             <form method="POST">
-                Name: <input name="name" type="text" value="$name"><br>
-                Age: <input name="age" type="text" value="$age"><br>
+                Username: <input name="username" type="text" value="$username"><br>
+                Email: <input name="email" type="email" value="$email"><br>
+                Password: <input name="pass1" type="password"><br>
+                Password (repeated): <input name="pass2" type="password"><br>
                 <input type="submit" value="Say Hello">
             </form>
             ENDMARKER;
             echo $form;
         }
         
-        if(isset($_POST['name']) || isset($_POST['age'])){
-            $name = $_POST['name'];
-            $age = $_POST['age'];
+        if(isset($_POST['username']) || isset($_POST['email'])){
+            $username = $_POST['username'];
+            $email = $_POST['email'];
+            $pass1 = $_POST['pass1'];
+            $pass2 = $_POST['pass2'];
             // verify inputs
             $errorList = array();
-            if(strlen($name)< 2 || strlen($name) > 50){
-                array_push($errorList, "name must be 2-50");
-                $name = "";
+            if(preg_match('/^[a-z0-9]{4,20}$/', $username) != 1){
+                $errorList[] = "Username must be 4-20 characters long made up of lower-case and numbers";
+                $username = "";
+            }else{
+                // but the username already in use
+                
             }
-            if(filter_var($age, FILTER_VALIDATE_INT) === FALSE || $age < 0 || $age >150){
-                array_push($errorList, "age must be 0-150");
-                $age = "";
+            if(filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE){
+                array_push($errorList, "email is invalid");
+                $email = "";
+            }else{
+                // but is the email already in use?
+
             }
             // submission failed with error
             if($errorList){
@@ -44,7 +54,7 @@
                     echo "<li>$error</li>";
                 }
                 echo '</ul>';
-                displayForm($name, $age);
+                displayForm($username, $email);
             }else{  // submission successful
                 // parsing and save data into database
                 // need to handle the database exception
@@ -56,8 +66,8 @@
                 // or if UPDATE users WHERE email='hacker@gamil.com' SET role='Admin' -- by execute the sql script, this user will be changed to Admin which is dangerous
 
                 $sql = sprintf("INSERT INTO people VALUES (NULL, '%s', '%s')",
-                                mysqli_real_escape_string($link, $name),
-                                mysqli_real_escape_string($link, $age),
+                                mysqli_real_escape_string($link, $username),
+                                mysqli_real_escape_string($link, $email),
                                 );
 
                 if(!mysqli_query($link, $sql)){
