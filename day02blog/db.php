@@ -1,4 +1,7 @@
 <?php 
+
+    session_start();
+    
     $dbUser = 'day02blog';
     $dbPass = 'zlzEztRNqeJ80i2g';
     $dbName = 'day02blog';

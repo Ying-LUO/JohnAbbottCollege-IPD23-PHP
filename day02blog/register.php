@@ -1,3 +1,7 @@
+<?php 
+    // include will issue just a warning, require will result a fatal error
+    require_once 'db.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,13 +9,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
+    <title>Register</title>
 </head>
 <body>
     <div id="centeredContent">
     <?php 
-        // include will issue just a warning, require will result a fatal error
-        require_once 'db.php';
         // <<<MARKER heredoc
         function displayForm($username = "", $email = ""){
             $form = <<< ENDMARKER
@@ -20,7 +22,7 @@
                 Email: <input name="email" type="email" value="$email"><br>
                 Password: <input name="pass1" type="password"><br>
                 Password (repeated): <input name="pass2" type="password"><br>
-                <input type="submit" value="Say Hello">
+                <input type="submit" value="Register">
             </form>
             ENDMARKER;
             echo $form;
@@ -38,14 +40,45 @@
                 $username = "";
             }else{
                 // but the username already in use
-                
+                $result = mysqli_query($link, sprintf("SELECT * FROM users WHERE username='%s'",
+                                                mysqli_real_escape_string($link, $username)));
+                if(!$result){
+                    echo "SQL Query failed: ".mysqli_error($link);
+                    exit;
+                }
+                $userRecord = mysqli_fetch_assoc($result);
+                if($userRecord){
+                    array_push($errorList, "This username is already registered");
+                    $username = "";
+                }
             }
             if(filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE){
                 array_push($errorList, "email is invalid");
                 $email = "";
             }else{
                 // but is the email already in use?
-
+                $result = mysqli_query($link, sprintf("SELECT * FROM users WHERE email='%s'",
+                                                mysqli_real_escape_string($link, $email)));
+                if(!$result){
+                    echo "SQL Query failed: ".mysqli_error($link);
+                    exit;
+                }
+                $userRecord = mysqli_fetch_assoc($result);
+                if($userRecord){
+                    array_push($errorList, "This email is already registered");
+                    $email = "";
+                }
+            }
+            if($pass1 != $pass2){
+                $errorList[] = "Passwords do not match";
+            }else{
+                if(strlen($pass1)< 6 || strlen($pass1) > 100
+                    ||(preg_match("/[A-Z]/", $pass1) == FALSE)
+                    ||(preg_match("/[a-z]/", $pass1) == FALSE)
+                    ||(preg_match("/[0-9]/", $pass1) == FALSE)){
+                            array_push($errorList, "Password must be 6-100 characters long, "
+                            ."with at least one uppercase, one lowercase and one digit in it");
+                    }
             }
             // submission failed with error
             if($errorList){
@@ -55,25 +88,18 @@
                 }
                 echo '</ul>';
                 displayForm($username, $email);
-            }else{  // submission successful
-                // parsing and save data into database
-                // need to handle the database exception
-
-                //$sql = "INSERT INTO people VALUES (NULL, '$name', '$age')"; 
-
-                // this is dangerous
-                // due to SQL injection, like back slash, e.g. Tommy's Friend will have exception
-                // or if UPDATE users WHERE email='hacker@gamil.com' SET role='Admin' -- by execute the sql script, this user will be changed to Admin which is dangerous
-
-                $sql = sprintf("INSERT INTO people VALUES (NULL, '%s', '%s')",
+            }else{  
+                $sql = sprintf("INSERT INTO users VALUES (NULL, '%s', '%s', '%s')",
                                 mysqli_real_escape_string($link, $username),
                                 mysqli_real_escape_string($link, $email),
+                                mysqli_real_escape_string($link, $pass1),
                                 );
 
                 if(!mysqli_query($link, $sql)){
                     echo "Fatal Error: Failed to execute SQL Query: " .mysqli_error($link);
                 }
-                echo "Hello $name, you are $age years old";
+                echo "<p>Registration successful!</p>";
+                echo '<p><a href="login.php">Click here to login</a></p>';
             }
         }else{  // first show
             displayForm();
