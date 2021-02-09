@@ -10,6 +10,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <title>Register</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            // get a selector/find a element by name
+            $('input[name=username]').keyup(function(){
+                // extract current value of the inputs
+                var username = $(this).val();  // this is the object in the DOM that trigger the event, read the value of this object
+                // easy for debugging by using console.log
+                // console.log('username: ' + username);
+                // made the call to load other php to validate username
+                username = encodeURIComponent(username);  // used to escape the special characters in username, like &/%...
+                $("#usernameTaken").load("isusernametaken.php?username=" + username);
+            });
+        });
+    </script>
 </head>
 <body>
     <div id="centeredContent">
@@ -18,7 +33,8 @@
         function displayForm($username = "", $email = ""){
             $form = <<< ENDMARKER
             <form method="POST">
-                Username: <input name="username" type="text" value="$username"><br>
+                Username: <input name="username" type="text" value="$username">
+                <span id="usernameTaken" class="errorMessage"></span><br>
                 Email: <input name="email" type="email" value="$email"><br>
                 Password: <input name="pass1" type="password"><br>
                 Password (repeated): <input name="pass2" type="password"><br>
