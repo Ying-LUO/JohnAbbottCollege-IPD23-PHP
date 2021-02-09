@@ -17,6 +17,7 @@
     <div id="centeredContent">
     <?php 
         function displayForm($title = "", $body = ""){
+            $title = htmlentities($title);
             $form = <<< ENDMARKER
             <form method="POST">
                 Title: <input name="title" type="text" value="$title"><br>
@@ -33,7 +34,9 @@
         }else{
             if(isset($_POST['title']) || isset($_POST['body'])){
                 $title = $_POST['title'];
-                $body = $_POST['body'];
+                $body = $_POST['body'];  
+                // need to sanitize the format of the body
+                $body = strip_tags($body, "<p><ul><li><em><strong><i><b><ol><h3><h4><h5><span>");
                 // verify inputs
                 $errorList = array();
                 if(strlen($title)<2 || strlen($title) >100){

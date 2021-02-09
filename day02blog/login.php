@@ -21,6 +21,7 @@
                 Username: <input name="username" type="text" value="$username"><br>
                 Password: <input name="password" type="password"><br>
                 <input type="submit" value="Login">
+                <a href="register.php">Register</a>
             </form>
             ENDMARKER;
             echo $form;
@@ -51,7 +52,7 @@
                 unset($userRecord['password']); // for safty reason remove the password
                 $_SESSION['blogUser'] = $userRecord;
                 echo "<p>Login successful!</p>";
-                echo '<p><a href="login.php">Click here to continues</a></p>';
+                echo '<p><a href="articleadd.php">Click here to continues</a></p>';
             }
         }else{  // first show
             displayForm();

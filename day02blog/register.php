@@ -12,6 +12,7 @@
     <title>Register</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        // AJAX part
         $(document).ready(function(){
             // get a selector/find a element by name
             $('input[name=username]').keyup(function(){
@@ -39,6 +40,7 @@
                 Password: <input name="pass1" type="password"><br>
                 Password (repeated): <input name="pass2" type="password"><br>
                 <input type="submit" value="Register">
+                <a href="login.php">Login</a>
             </form>
             ENDMARKER;
             echo $form;
