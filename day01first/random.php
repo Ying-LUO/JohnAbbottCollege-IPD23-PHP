@@ -24,35 +24,36 @@
         // but normally php is loosely type language not like java strict language
         // empty string or string of "0" or any 0 int/float numbers is considered as false
         // empty array with zero element is considered as false
+        
+        if(!isset($_GET['min']) || !isset($_GET['max'])){
+            array_push($errorList, "Please enter values for submission");
+            //or
+            $errorList[] = "Please enter values for submission";
+        }else if(filter_var($_GET['min'], FILTER_VALIDATE_INT) === FALSE){
+            $errorList[] = "Please enter valid value";
+        }else if(!isInt($_GET['min']) || !isInt($_GET['max'])){
+            array_push($errorList, "Min/Max must be integer values");
+            // or
+            $errorList[] = "Min/Max must be integer values";
+            // is_int() method is only checking the variable type but not checking the content
+            // but currently all input from ui is all string, you have to cast it to other type
+            // that's why if you check is_int() will always return false
+            // use user-added function isInt() above to check if integers
+        }else if(($_GET['min']) > ($_GET['max'])){
+            echo "ERROR: min must be smaller than max";
+        }
+        
         if($errorList){  // there were errors - display them
             echo '<ul>';
             foreach($errorList as $error){
                 echo "<li>$error</li>";
             }
             echo '</ul>';
-        }else{
-            if(!isset($_GET['min']) || !isset($_GET['max'])){
-                array_push($errorList, "Please enter values for submission");
-                //or
-                $errorList[] = "Please enter values for submission";
-            }else if(filter_var($min, FILTER_VALIDATE_INT) === FALSE){
-                // another way to validate
-            }else if(!isInt($_GET['min']) || !isInt($_GET['max'])){
-                array_push($errorList, "Min/Max must be integer values");
-                // or
-                $errorList[] = "Min/Max must be integer values";
-                // is_int() method is only checking the variable type but not checking the content
-                // but currently all input from ui is all string, you have to cast it to other type
-                // that's why if you check is_int() will always return false
-                // use user-added function isInt() above to check if integers
-            }else if(($_GET['min']) > ($_GET['max'])){
-                echo "ERROR: min must be smaller than max";
-            }else{ // submission recieved
+        }else{ // submission recieved
                 for ($x = 0; $x < 10; $x++) {
                     $random = rand($_GET['min'], $_GET['max']);
-                    echo "$random ,";
+                    printf("%s%d", ($i == 0? "":","), $random);
                 }
-            }
         }
     ?>
 </body>
