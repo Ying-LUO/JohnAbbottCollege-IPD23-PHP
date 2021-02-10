@@ -17,7 +17,7 @@
                 echo "<p>You are logged in as ".$_SESSION['blogUser']['username'].".";
                 echo "You can <a href=\"logout.php\">Logout</a> or <a href=\"articleadd.php\">Post an article</a></p>\n";
             }else{
-                echo "<a href=\"login.php\">Login</a>";
+                echo "<a href=\"login.php\">Login</a> or <a href=\"register.php\">Register</a>";
             }
         ?>
         <div id="mainContent">
