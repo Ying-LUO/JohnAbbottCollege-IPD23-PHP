@@ -4,6 +4,16 @@ session_start();
 
 require_once 'vendor/autoload.php';
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+// create a log channel
+$log = new Logger('main');
+$log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
+$log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
+
+$log->pushProcessor();
+
 if (strpos($_SERVER['HTTP_HOST'], "ipd23.com") !== false) {
 
     DB::$dbName = 'cp4996_yingauctions';
@@ -25,7 +35,11 @@ $config = ['settings' => [
 $app = new \Slim\App($config);
 
 // Fetch DI Container
-$container = $app->getContainer();
+$log->pushProcessor(function ($record) {
+    $record['extra']['user'] = isset($_SESSION['user']) ? $_SESSION['user']['username'] : '=anonymous=';
+    $record['extra']['ip'] = $_SERVER['REMOTE_ADDR'];
+    return $record;
+});
 
 // Register Twig View helper
 $container['view'] = function ($c) {
@@ -33,7 +47,7 @@ $container['view'] = function ($c) {
         'cache' => dirname(__FILE__) . '/tmplcache',
         'debug' => true, // This line should enable debug mode
     ]);
-    //
+    // this value will be us
     $view->getEnvironment()->addGlobal('test1','VALUE');
     // Instantiate and add Slim specific extension
     $router = $c->get('router');
@@ -81,8 +95,8 @@ $app->get('/newauction', function ($request, $response, $args) {
     return $this->view->render($response, 'newauction.html.twig');
 });
 
-// STATE 2&3: receiving submission
-$app->post('/newauction', function ($request, $response, $args) {
+// STATE 2&3: receiving submission                             // for log global use
+$app->post('/newauction', function ($request, $response, $args) use ($log){
     $itemDescription = $request->getParam('itemDescription');
     $sellersName = $request->getParam('sellersName');
     $sellersEmail = $request->getParam('sellersEmail');
@@ -108,6 +122,8 @@ $app->post('/newauction', function ($request, $response, $args) {
         return $this->view->render($response, 'newauction.html.twig', ['errorList' => $errorList, 'v' => $valuesList]);
     } else { // STATE 3: success
         DB::insert('auctions', $valuesList);
+        //global $log; // give access to global variable of log
+        $log->debug(sprintf("New auction created with Id=%s FROM IP=%s", DB::insertId(), $_SERVER['REMOTE_ADDR']));
         return $this->view->render($response, 'newauction_success.html.twig');
     }
 });
@@ -124,7 +140,7 @@ $app->get('/placebid/{id:[0-9]+}', function ($request, $response, $args) {
 }); // regex for id
 
 // STATE 2&3: receiving submission
-$app->post('/placebid/{id:[0-9]+}', function ($request, $response, $args) {
+$app->post('/placebid/{id:[0-9]+}', function ($request, $response, $args) use($log){
     $biddersName = $request->getParam('biddersName');
     $biddersEmail = $request->getParam('biddersEmail');
     $newBidPrice = $request->getParam('newBidPrice');
@@ -152,6 +168,8 @@ $app->post('/placebid/{id:[0-9]+}', function ($request, $response, $args) {
     } else { // STATE 3: success
         $valuesList = ['lastBidderName' => $biddersName, 'lastBidderEmail' => $biddersEmail, 'lastBidPrice' => $newBidPrice];
         DB::update('auctions', $valuesList, "id=%i", $args['id']);
+        $log->debug(sprintf("New auction created with Id=%s FROM IP=%s", $args['id'], $_SERVER['REMOTE_ADDR']));
+        
         // FLASH MESSAGE INSTEAD of success page
         setFlashMessage("Bid placed successfully");
         // return $this->view->render($response, 'placebid_success.html.twig');

@@ -92,3 +92,7 @@ https://download.filezilla-project.org/client/FileZilla_3.52.2_win64_sponsored-s
 
 if (strpos($_SERVER['HTTP_HOST'], "ipd23.com") !== false) {
 
+DB::$dbName = 'cp4996_skirentals';
+DB::$user = 'cp4996_skirentals';
+DB::$password = 'OS5a2m]qDfdK';
+
