@@ -1,0 +1,94 @@
+From Gregory Prokopski to Everyone:  09:04 AM
+https://getcomposer.org/download/
+https://packagist.org/
+From Gregory Prokopski to Everyone:  09:31 AM
+C:\ProgramData\
+"composer.executablePath": "C:\\ProgramData\\ComposerSetup\\bin\\composer.bat"
+From Gregory Prokopski to Everyone:  09:52 AM
+https://packagist.org/packages/slim/slim
+From Vladimir to Everyone:  09:55 AM
+me 2 :(
+From Gregory Prokopski to Everyone:  10:31 AM
+https://www.slimframework.com/docs/v3/
+'displayErrorDetails' => true
+From Gregory Prokopski to Everyone:  10:41 AM
+// Fetch DI Container
+$container = $app->getContainer();
+
+// Register Twig View helper
+$container['view'] = function ($c) {
+    $view = new \Slim\Views\Twig(dirname(__FILE__) . '/templates', [
+        'cache' => dirname(__FILE__) . '/cache',
+        'debug' => true, // This line should enable debug mode
+    ]);
+    //
+    $view->getEnvironment()->addGlobal('test1','VALUE');
+    // Instantiate and add Slim specific extension
+    $router = $c->get('router');
+    $uri = \Slim\Http\Uri::createFromEnvironment(new \Slim\Http\Environment($_SERVER));
+    $view->addExtension(new \Slim\Views\TwigExtension($router, $uri));
+    return $view;
+};
+From Vladimir to Everyone:  11:01 AM
+thank you
+From Gregory Prokopski to Everyone:  11:47 AM
+LUNCH BREAK UNTIL 12:15PM
+From Gregory Prokopski to Everyone:  12:39 PM
+https://twig.symfony.com/doc/3.x/tags/extends.html
+From Gregory Prokopski to Everyone:  12:57 PM
+C:\Windows\System32\drivers\etc
+/etc/hosts
+127.0.0.1     day04slimfirst.local      day04slimauctions.local
+From Gregory Prokopski to Everyone:  01:07 PM
+<VirtualHost *:8888>
+    DocumentRoot ""
+    ServerName day04slimfirst.local  
+</VirtualHost>
+http://day04slimfirst.local:8888/
+<VirtualHost *:8888>
+    DocumentRoot "C:/xampp/htdocs/ipd23/day04slimfirst"
+    ServerName day04slimfirst.local  
+</VirtualHost>
+From Gregory Prokopski to Everyone:  01:20 PM
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
+From Parinaz M to Everyone:  01:31 PM
+For Mac :
+<VirtualHost *:8888>
+    ServerName day04slimfirst.local
+    DocumentRoot "/Applications/XAMPP/htdocs/php/day04slimfirst"
+    <Directory "/Applications/XAMPP/htdocs/php/day04slimfirst">
+        Options Indexes FollowSymLinks Includes execCGI
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+cartItems
+- id
+- sessionId is session_id()
+- equipmentId -> equipments.id
+- quantity
+
+orders
+- id
+- userId -> users.id
+- totalPrice
+- payment...
+
+
+orderItems
+- id
+- orderId -> orders.id
+
+http://69.16.227.64/~cp4996/
+http://69.16.227.64/cpanel
+
+Your username for this account is: cp4996
+ Your password for this account is: ioteder0
+
+https://download.filezilla-project.org/client/FileZilla_3.52.2_win64_sponsored-setup.exe
+
+if (strpos($_SERVER['HTTP_HOST'], "ipd23.com") !== false) {
+

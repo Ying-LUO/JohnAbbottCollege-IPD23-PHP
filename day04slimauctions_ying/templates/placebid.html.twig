@@ -1,0 +1,26 @@
+{% extends "master.html.twig" %}
+
+{% block title %}Place Bid{% endblock %}
+
+{% block content %}
+
+<h1>Place bid</h1>
+
+<div class="itemDescription">{{a.itemDescription}}</div>
+
+{% if errorList %}
+<ul>
+    {% for error in errorList %}
+        <li class="errorMessage">{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="POST">
+    Your Name: <input  type="text" name="biddersName" value="{{ a.biddersName }}"><br>
+    Your email: <input  type="email" name="biddersEmail" value="{{ a.biddersEmail }}"><br>
+    Your Bid Price: <input  type="text" name="newBidPrice" value="{{ a.newBidPrice }}" ><br>
+    <input  type="submit" value="Create Auction" ><br>
+</form>
+
+{% endblock content %}

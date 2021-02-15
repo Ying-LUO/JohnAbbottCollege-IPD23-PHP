@@ -1,0 +1,43 @@
+{% extends "master.html.twig" %}
+
+{% block title %}List of auctions{% endblock %}
+
+{% block content %}
+
+<p><a href="/newauction">.</a></p>
+
+<table>
+    <tr>
+        <th>
+            #
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            Photo
+        </th>
+        <th>
+            Seller's Name
+        </th>
+        <th>
+            Last Bid Price
+        </th>
+        <th>
+            Actions
+        </th>
+    </tr>
+    {% for a in list %}
+        <tr>
+            <th>{{a.id}}</th>
+            <th>{{a.itemDescription}}</th>
+            <th><img src="{{a.itemImagePath}}" width="150"></th>
+            <th>{{a.sellersName}}</th>
+            <th>{{a.sellerEmail}}</th>
+            <th>{{a.lastBidPrice}}</th>
+            <th><a href="/placebid/{{a.id}}">View details and place bid</a></th>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock content %}
