@@ -2,6 +2,21 @@
 
 {% block title %}Place bid{% endblock %} 
 
+{% block head %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('input[name=newBidPrice]').keyup(function() {
+                var newBidPrice = $(this).val();
+                // console.log('username: ' + username);
+                // FIXME: special chars in username?
+                newBidPrice = encodeURIComponent(newBidPrice);
+                $('#bidTooLowMsg').load("/isbidtoolow/{{a.id}}/" + newBidPrice);
+            });
+        });
+    </script>
+{% endblock head %}
+
 {% block content %}
 
 <h1>Place bid</h1>
@@ -10,7 +25,6 @@
 <img src="{{a.itemImagePath}}" width="150"><br>
 <p>Seller: {{a.sellersName}}, last bid price: <strong>{{a.lastBidPrice}}</strong></p>
 
-{# FLASH ??? #}
 
 {% if errorList %}
     <ul>
@@ -24,7 +38,7 @@
     Your name: <input type="text" name="biddersName" value="{{ v.biddersName }}"><br>
     Your email: <input type="email" name="biddersEmail" value="{{ v.biddersEmail }}"><br>
     Your bid price: <input type="text" name="newBidPrice" value="{{ v.newBidPrice }}">
-    <span id="bidTooLowMsg"></span><br>
+    <span id="bidTooLowMsg" class="errorMessage"></span><br>
     <input type="submit" value="Place your bid">
 </form>
 
