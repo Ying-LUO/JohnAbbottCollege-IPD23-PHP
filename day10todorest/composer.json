@@ -1,0 +1,9 @@
+{
+    "name": "teacher/ipd23",
+    "description": "ipd23 REST API",
+    "require": {
+        "slim/slim": "3.12.3",
+        "sergeytsalkov/meekrodb": "^2.3",
+        "monolog/monolog": "^2.2"
+    }
+}
