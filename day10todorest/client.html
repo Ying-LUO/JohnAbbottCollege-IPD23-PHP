@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App Client</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ajaxError(function(){
+            alert("AJAX error");
+        });
+
+        $(document).ready(function(){
+            //for test purpose
+            //alert("it works");
+            $("#viewAddEditPane").hide();
+            refreshTodoList();
+
+            $("#showAddItem").click(function(){
+                $("#viewAddEditPane").show();  //show the form to add item
+                $("#saveOrAdd").html("Add todo");  // change the button content
+                $("#delete").prop('disable', true);
+                // reset input to empty
+                $("input[name=task]").val("");
+                $("input[name=dueDate]").val("");
+                $("input[name=isDone]").prop('checked', false);
+            });
+
+            $("#cancel").click(function(){
+                $("#viewAddEditPane").hide();
+            });
+
+            $("#saveOrAdd").click(function(){
+                //extract information from input fields
+                var taskVal = $("input[name=task]").val();
+                var dueDateVal = $("input[name=task]").val();
+                var isDoneVal = $("input[name=isDone]").prop('checked') ? 'done' : 'pending';
+                // TODO: Verify values in the client first
+                // create a object named "todoObj" without define a object and instatiate it with data from input
+                var todoObj = {task: taskVal, dueDate: dueDateVal, isDone: isDoneVal};
+                var jsonString = JSON.stringify(todoObj);
+                $.ajax({
+                    url: '/todos',
+                    type: 'POST',
+                    dataType: "json",
+                    data: jsonString // body of the request
+                }).done(function(todoList) {
+                    alert("Record added successfully");
+                    $("#viewAddEditPane").hide();
+                    refreshTodoList();
+                });
+            });
+
+        });
+
+        function refreshTodoList(){
+            // make AJAX request
+            //(method) JQueryStatic.ajax(settings: JQueryAjaxSettings): JQueryXHR (+1 overload)
+            $.ajax({
+                url: '/todos',
+                type: 'GET',
+                datatype: "json"     // what we're recieving
+            }).done(function(todoList){  //get array of object list as parameter once ajax is done
+                //concactenating strings
+                var result = '<tr><th>#</th><th>Task</th><th>due Date</th><th>Done?</th></tr>';
+                for(var i=0; i<todoList.length; i++){
+                    var todo = todoList[i];
+                     result += '<tr>';
+                        result += '<td>' + todo.id + '</td>';
+                        result += '<td>' + todo.task + '</td>';
+                        result += '<td>' + todo.dueDate + '</td>';
+                        result += '<td>' + todo.isDone + '</td>';
+                     result += '</tr>' + "\n";
+                }
+                // put data back to the html by id
+                $("#listTable").html(result);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="centerContent">
+        <div id="mainAppPane">
+            <div id="listPane">
+                <button id="showAddItem">Add item</button>
+                <table id="listTable" border="1">
+                    <!--write data inside from ajax-->
+                </table>
+            </div>
+            <div id="viewAddEditPane">
+                Current Id: <span id="currentId"></span><br>
+                Task: <input type="text" name="task"><br>
+                Due date: <input type="date" name="dueDate"><br>
+                Is done: <input type="checkbox" name="isDone"><br>
+                <button id="saveOrAdd">Save or Add</button>
+                <button id="delete">Delete</button>
+                <button id="cancel">Cancel</button>
+            </div>            
+        </div>
+    </div>
+</body>
+</html>

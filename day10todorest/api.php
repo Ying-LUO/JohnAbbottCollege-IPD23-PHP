@@ -54,10 +54,13 @@ $container['notFoundHandler'] = function ($container) {
 };
 
 // apache local server configuration
-
+$app->get('/', function ($request, $response, $args) {
+    $response->getBody()->write("Todo app with RESTful API");
+    return $response;
+});
 
 // API calls bandlers are below
-$app->get('/todos', function(Request $request, Response $response, array $args){
+$app->get('/todos', function($request, $response, $args){
     // browser thought json response is html(from Network->Content Type)
     // so change the default format to application/json
     $response = $response->withHeader('Content-type', 'application/json; charset=UTF-8');
@@ -79,7 +82,7 @@ $app->get('/todos', function(Request $request, Response $response, array $args){
     // after sending, we'll get a single string of what we have send
     // we what change the string to a key-value pair array
 // 3 section: response
-$app->post('/todos', function(Request $request, Response $response, array $args) use($log){
+$app->post('/todos', function($request, $response, $args) use($log){
     $response = $response->withHeader('Content-type', 'application/json; charset=UTF-8');
     $json = $request->getBody();  // recieveing
     $item = json_decode($json, TRUE); // decode the string of json and return it into an associated array instead of an object
@@ -89,6 +92,7 @@ $app->post('/todos', function(Request $request, Response $response, array $args)
     $result = validateTodo($item);
     if($result !== TRUE){
         $response = $response->withStatus(404);
+        $response->getBody()->write(json_encode("400 - " . $result));
         return $response;
     }
     DB::insert('todos', $item);
@@ -100,7 +104,7 @@ $app->post('/todos', function(Request $request, Response $response, array $args)
 });
 
 // delete one record by id
-$app->delete('/todos/{id:[0-9]+}', function(Request $request, Response $response, array $args) use($log){
+$app->delete('/todos/{id:[0-9]+}', function($request, $response, $args) use($log){
     $response = $response->withHeader('Content-type', 'application/json; charset=UTF-8');
     DB::delete('todos', "%id=%i", $args['id']);
     $log->debug("Record todos deleted id= " . $args['id']);
@@ -112,7 +116,7 @@ $app->delete('/todos/{id:[0-9]+}', function(Request $request, Response $response
 });
 
 // fetch one record by id
-$app->get('/todos/{id:[0-9]+}', function(Request $request, Response $response, array $args){
+$app->get('/todos/{id:[0-9]+}', function($request, $response, $args){
     $response = $response->withHeader('Content-type', 'application/json; charset=UTF-8');
     // use queryFirstRow rather than query to select only one record
     $item = DB::queryFirstRow("SELECT * FROM todos WHERE id=%i", $args['id']);
@@ -126,14 +130,20 @@ $app->get('/todos/{id:[0-9]+}', function(Request $request, Response $response, a
     return $response;
 });
 
-$app->map(['PUT', 'PATCH'], '/todos/{id:[0-9]+}', function(Request $request, Response $response, array $args) use($log){
+$app->map(['PUT', 'PATCH'], '/todos/{id:[0-9]+}', function($request, $response, $args) use($log){
     $response = $response->withHeader('Content-type', 'application/json; charset=UTF-8');
     $json = $request->getBody();  // recieveing
     $item = json_decode($json, TRUE); // json decode return null if failed to validate due to syntax errors
     // TODO: VALIDATE
     // verify if the one in DB exists to update first
     $method = $request->getMethod();
+    
     $result = validateTodo($item, $method == 'PATCH');
+    if ( $result !== TRUE) {
+        $response = $response->withStatus(400);
+        $response->getBody()->write(json_encode("400 - " . $result));
+        return $response;
+    }
     $origItem = DB::queryFirstRow("SELECT * FROM todos WHERE id=%i", $args['id']);
     // if the original item aimed to updated is not existed in DB, then throw exception not found
     if(!$origItem){
@@ -182,7 +192,25 @@ function validateTodo($todo, $forPatch = false){
             return "Task description must be 1-100";
         }
     }
-
+    // - dueDate a valid date from 1900 to 2099 years
+    if (isset($todo['dueDate'])) {
+        if (!date_create_from_format('Y-m-d', $todo['dueDate'])) {
+            return "DueDate has invalid format";
+        }
+        // valid dates are from 1900-01-01 to almost 2100-01-01
+        $dueDate = strtotime($todo['dueDate']); // integer Unix time value
+        if ($dueDate < strtotime('1900-01-01') || $dueDate >= strtotime('2100-01-01')) {
+            return "DueDate must be within 1900 to 2099 years";
+        }
+    }
+    // - isDone must be pending or done
+    if (isset($todo['isDone'])) {
+        if (!in_array($todo['isDone'], ['pending','done'])) {
+            return "IsDone invalid: must be either pending or done";
+        }
+    }
+    // if we passed all tests return TRUE
+    return TRUE;
 }
 
 // Run app - must be the last operation

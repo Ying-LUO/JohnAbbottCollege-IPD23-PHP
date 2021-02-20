@@ -1,0 +1,24 @@
+body {
+    background-color: #ffffcc;
+}
+div {
+    margin: 12px 5px;
+}
+#centerContent {
+    width: 740px;
+    padding: 0;
+    margin: 0 auto;
+    background-color: white;
+}
+#listPane {
+    border: darkgray 1px solid;
+    width: 340px;
+    display: inline-table;
+}
+#viewAddEditPane {
+    border: darkgray 1px solid;
+    width: 340px;
+    display: inline-table;
+}
+.dueDateColumn { width: 80px; 
+}
