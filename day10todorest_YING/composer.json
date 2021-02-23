@@ -1,6 +1,6 @@
 {
-    "name": "teacher/ipd",
-    "description": "teacher's project",
+    "name": "teacher/ipd23",
+    "description": "ipd23 REST API",
     "require": {
         "slim/slim": "3.12.3",
         "sergeytsalkov/meekrodb": "^2.3",

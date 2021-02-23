@@ -96,3 +96,15 @@ DB::$dbName = 'cp4996_skirentals';
 DB::$user = 'cp4996_skirentals';
 DB::$password = 'OS5a2m]qDfdK';
 
+
+From Tom Garliaris to Everyone:  10:09 AM
+2
+From Gregory Prokopski to Everyone:  10:10 AM
+// set content-type globally using middleware
+$app->add(function($request, $response, $next) {
+    $response = $next($request, $response);
+    return $response->withHeader('Content-Type', 'application/json');
+});
+From Gregory Prokopski to Everyone:  10:56 AM
+https://i.gifer.com/YGgI.gif
+

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>auction App Client</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+
+        var currId = 0; // id of the currently selected item, 0 if none
+       
+        $(document).ready(function() {
+            
+            $("#biddingPane").hide();
+            refreshAuctionList();
+
+            $("#cancel").click(function() {
+                $("#biddingPane").hide();
+            });
+
+            $("#placeBid").click(function() {
+                var lastBidderEmailVal = $("input[name=lastBidderEmail]").val();
+                var lastBidVal = $("input[name=lastBid]").val();
+                // auction: verfiy values in the client first
+                var auctionObj = { lastBidderEmail: lastBidderEmailVal, lastBid: lastBidVal };
+                var jsonString = JSON.stringify(auctionObj);
+                $.ajax({
+                    url: '/auctions/' + currId,
+                    type: 'PUT',
+                    dataType: "json",
+                    data: jsonString,
+                    error: function(xhr, status, error) {
+                            alert(xhr.responseText);
+                            }
+                }).done(function(auctionList) {
+                    alert("New Bid is put to Acution id= " + currId + " successfully");
+                    currId = 0;
+                    $("input[name=lastBid]").val("");
+                    $("#biddingPane").hide();
+                    refreshAuctionList();
+                });
+            });
+        });
+
+        function refreshAuctionList() {
+            $.ajax({
+                url: '/auctions',
+                type: 'GET',
+                dataType: "json"
+            }).done(function(auctionList) {
+                var result = '<tr><th>#</th>'
+                    + '<th>description</th>'
+                    + '<th>seller email</th>'
+                    + '<th>last bid</th>'
+                    + '<th>last bidder email</th></tr>';
+                for (var i=0; i <auctionList.length; i++) {
+                    var auction = auctionList[i];
+                    result += '<tr onclick="selectItem(' + auction.id + ')">';
+                    result += '<td>' + auction.id + '</td>';
+                    result += '<td>' + auction.itemDesc + '</td>'; 
+                    result += '<td>' + auction.sellerEmail + '</td>';
+                    result += '<td>' + auction.lastBid + '</td>';
+                    result += '<td>' + auction.lastBidderEmail + '</td>';
+                    result += '</tr>' + "\n";
+                }
+                $("#listTable").html(result);
+            });
+        }
+
+        function selectItem(id) {
+            $.ajax({
+                url: '/auctions/' + id,
+                type: 'GET',
+                dataType: "json",
+            }).done(function(auction) {
+                currId = auction.id; // or id
+                $("#biddingItem").html("You're bidding on item #_" + auction.id 
+                                        +"_ which is _"+ auction.itemDesc
+                                        +"_ put up for auction by _" + auction.sellerEmail
+                                        +"_, current bid is $_" + auction.lastBid
+                                        +"_ by _" + auction.lastBidderEmail
+                                        +"_.");
+                $("#biddingPane").show();
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="centerContent">
+        <a href="additem.html">Add a new auction</a>
+        <div id="bidderPane">
+            My email (bidder): <input type="email" name="lastBidderEmail"><br>
+        </div>
+        <div id="mainAppPane">
+            <div id="listPane">
+                <table id="listTable" border="1"></table>
+            </div>
+            <div id="biddingPane">
+                <p id="biddingItem"></p>
+                Place your bid: <input type="number" name="lastBid" min="0" step="0.01" ><br>
+                <button id="placeBid">Place bid</button>
+                <button id="cancel">Cancel</button>
+            </div>            
+        </div>
+    </div>
+</body>
+</html>

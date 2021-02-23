@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction - Add New Item</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        
+        $(document).ready(function() {
+           
+            $("#addAuction").click(function() {
+                var itemDescVal = $("textarea[name=itemDesc]").val();
+                var sellerEmailVal = $("input[name=sellerEmail]").val();
+                // TODO: verfiy values in the client first
+                var auctionObj = { itemDesc: itemDescVal, sellerEmail: sellerEmailVal };
+                var jsonString = JSON.stringify(auctionObj);
+                $.ajax({
+                    url: '/auctions',
+                    type: 'POST',
+                    dataType: "json",
+                    data: jsonString,
+                    error: function(xhr, status, error) {
+                            alert(xhr.responseText);
+                            }
+                }).done(function(auctionList) {
+                    alert("New auction added successfully");
+                    $("textarea[name=itemDesc]").html("");
+                    window.location.href = 'bidding.html'; 
+                });
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <div id="centerContent">
+        <a href="bidding.html">Make a bid</a>
+        <div id="mainAppPane">
+            <div id="addAuctionPane">
+                <h3>Add new item for auction</h3><br>
+                Description: <textarea name="itemDesc" rows="5" cols="50"></textarea><br>
+                Seller email: <input type="email" name="sellerEmail"><br>
+                <button id="addAuction">Place item for auction</button>
+            </div>            
+        </div>
+    </div>
+</body>
+</html>
